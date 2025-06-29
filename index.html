@@ -6,10 +6,9 @@
   <title>EcoMeter - Carbon Footprint Calculator</title>
   <!-- Changed to relative path -->
   <link rel="icon" href="./Logo.png" type="image/png">
-  <!-- Using CDN resources which should work everywhere -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+<script src="https://cdn.tailwindcss.com" defer></script>
   <style>
     @keyframes fade-in {
       from {
@@ -322,9 +321,10 @@
   </div>
 
   <script>
-    // Initialize Lucide icons
-    lucide.createIcons();
-
+    document.addEventListener("DOMContentLoaded", () => {
+  lucide.createIcons();
+  calculateBtn.addEventListener('click', calculateEmissions);
+});
     // Emission constants
     const vehicleEmissions = {
       car: 0.21,
@@ -549,8 +549,6 @@
       });
     }
 
-    // Event listeners
-    calculateBtn.addEventListener('click', calculateEmissions);
   </script>
 </body>
 </html>
