@@ -44,13 +44,13 @@
 
 ## 👥 Team: NullPointers
 
-### 🧑‍💻 Vasudev V
+### 🧑‍💻 [Vasudev V](https://github.com/Vasu-uu)
 - Developed CO₂ **calculation logic** in JavaScript  
 - Integrated and configured **Chart.js**  
 - Handled all **DOM updates, result formatting, and interactivity**  
 - Tested and fine-tuned logic and UI behavior  
 
-### 👩‍💻 Lakshmi Ratheesan
+### 👩‍💻 [Lakshmi Ratheesan](https://github.com/lakshmir-25)
 - Designed the full **HTML structure and layout**  
 - Implemented styling using **Tailwind CSS**  
 - Authored **sustainability tips and labels**  
