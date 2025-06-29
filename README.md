@@ -14,7 +14,7 @@
 
 ## 🎥 Demo Video
 
-[▶️ Watch Demo on Google Drive](https://drive.google.com/file/d/1OLfgp_Fjmh8X5iXgVZqXEGJPH7bNx_ZX/view?usp=sharing)
+[▶️ Watch Demo](https://vimeo.com/1097254159/a0ec1cfcde?ts=0&share=copy)
 
 ---
 
