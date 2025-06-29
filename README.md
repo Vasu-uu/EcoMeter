@@ -1,6 +1,6 @@
 # 🌱 EcoMeter – Carbon Footprint Calculator
 
-EcoMeter is a clean, responsive, and fully client-side web application that helps users estimate their monthly carbon footprint based on transportation, energy usage, and dietary habits. It’s designed to raise awareness and empower people to take actionable steps toward sustainability.
+**EcoMeter** is a clean, responsive, and fully client-side web application that helps users estimate their monthly carbon footprint based on transportation, energy usage, and dietary habits. It’s designed to raise awareness and empower people to take actionable steps toward sustainability.
 
 ![EcoMeter Logo](./Logo.png)
 
@@ -8,7 +8,13 @@ EcoMeter is a clean, responsive, and fully client-side web application that help
 
 ## 🚀 Live Preview
 
-[🔗 Click to View Demo](#) *(optional link to hosted project)*
+[🌐 View Site](https://vasu-uu.github.io/EcoMeter/)
+
+---
+
+## 🎥 Demo Video
+
+[▶️ Watch Demo on Google Drive](https://drive.google.com/file/d/1OLfgp_Fjmh8X5iXgVZqXEGJPH7bNx_ZX/view?usp=sharing)
 
 ---
 
@@ -81,6 +87,14 @@ EcoMeter is a clean, responsive, and fully client-side web application that help
 
 ### 📊 Results and Tips  
 ![Screenshot – Results](./Screenshot/Capture2.PNG)
+
+---
+
+## 🧭 Hackathon Context
+
+**EcoMeter** was built as part of **Sankalp 101 – India’s First Virtual 2D Environment Hackathon**, a 24-hour immersive online event hosted on **Gather.town**.
+
+> Sankalp 101 is India’s first-ever 24-hour virtual 2D hackathon. This immersive online experience eliminates physical barriers, allowing participants to collaborate, innovate, and build impactful solutions in a fully interactive virtual space.
 
 ---
 
