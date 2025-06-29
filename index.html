@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoMeter - Carbon Footprint Calculator</title>
+  <link rel="icon" href="Logo.png" type="image/png">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fade-in {
+      animation: fade-in 0.6s ease-out;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9ca3af;
+    }
+
+    /* Smooth focus transitions */
+    input:focus, select:focus, button:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Enhanced button animations */
+    button {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    /* Card hover effects */
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Responsive text sizing */
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 2.5rem;
+      }
+      
+      .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50">
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white py-12">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-center mb-4">
+        <i data-lucide="leaf" class="w-12 h-12 mr-4 animate-pulse"></i>
+        <h1 class="text-4xl md:text-5xl font-bold">EcoMeter</h1>
+      </div>
+      <p class="text-xl text-center max-w-2xl mx-auto opacity-90">
+        Discover your environmental impact and learn how to reduce your carbon footprint for a sustainable future.
+      </p>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-12">
+    <!-- Error Messages -->
+    <div id="errorContainer" class="mb-8 bg-red-50 border border-red-200 rounded-xl p-6 hidden">
+      <div class="flex items-center mb-3">
+        <i data-lucide="alert-circle" class="w-5 h-5 text-red-500 mr-2"></i>
+        <h3 class="text-red-800 font-semibold">Please fix the following errors:</h3>
+      </div>
+      <ul id="errorList" class="list-disc list-inside text-red-700 space-y-1">
+      </ul>
+    </div>
+
+    <!-- Main Form -->
+    <div class="bg-white rounded-2xl shadow-xl p-8 mb-12">
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Transportation Section -->
+        <div class="space-y-6">
+          <div class="flex items-center mb-6">
+            <i data-lucide="car" class="w-8 h-8 text-blue-600 mr-3"></i>
+            <h2 class="text-2xl font-bold text-gray-800">Transportation</h2>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Vehicle Type
+            </label>
+            <select
+              id="vehicleType"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            >
+              <option value="">Select vehicle type</option>
+              <option value="car">Car</option>
+              <option value="bike">Bike/Motorcycle</option>
+              <option value="bus">Bus</option>
+              <option value="train">Train</option>
+              <option value="flight">Flight</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Kilometers per Week
+            </label>
+            <input
+              type="number"
+              id="weeklyKm"
+              min="0"
+              step="0.1"
+              placeholder="e.g., 50"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            />
+          </div>
+        </div>
+
+        <!-- Energy Section -->
+        <div class="space-y-6">
+          <div class="flex items-center mb-6">
+            <i data-lucide="zap" class="w-8 h-8 text-yellow-600 mr-3"></i>
+            <h2 class="text-2xl font-bold text-gray-800">Energy Use</h2>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Electricity Units per Month
+            </label>
+            <input
+              type="number"
+              id="electricityUnits"
+              min="0"
+              step="1"
+              placeholder="e.g., 300"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              LPG Cylinders per Month
+            </label>
+            <input
+              type="number"
+              id="lpgCylinders"
+              min="0"
+              step="0.5"
+              placeholder="e.g., 1"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
+            />
+          </div>
+        </div>
+
+        <!-- Diet Section -->
+        <div class="space-y-6">
+          <div class="flex items-center mb-6">
+            <i data-lucide="apple" class="w-8 h-8 text-green-600 mr-3"></i>
+            <h2 class="text-2xl font-bold text-gray-800">Diet</h2>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Diet Type
+            </label>
+            <select
+              id="dietType"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+            >
+              <option value="">Select diet type</option>
+              <option value="meat-heavy">Meat-heavy</option>
+              <option value="mixed">Mixed (Balanced)</option>
+              <option value="vegetarian">Vegetarian</option>
+              <option value="vegan">Vegan</option>
+            </select>
+          </div>
+
+          <div class="bg-green-50 p-4 rounded-lg">
+            <h4 class="font-semibold text-green-800 mb-2">Diet Impact Info:</h4>
+            <ul class="text-sm text-green-700 space-y-1">
+              <li>• Meat-heavy: 600 kg CO₂/year</li>
+              <li>• Mixed: 450 kg CO₂/year</li>
+              <li>• Vegetarian: 350 kg CO₂/year</li>
+              <li>• Vegan: 300 kg CO₂/year</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calculate Button -->
+      <div class="flex justify-center mt-12">
+        <button
+          id="calculateBtn"
+          class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-4 px-12 rounded-full text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center"
+        >
+          <i data-lucide="calculator" class="w-6 h-6 mr-3"></i>
+          Calculate My Carbon Footprint
+        </button>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div id="resultsContainer" class="bg-white rounded-2xl shadow-xl p-8 hidden animate-fade-in">
+      <div class="flex items-center justify-center mb-8">
+        <i data-lucide="pie-chart" class="w-10 h-10 text-blue-600 mr-4"></i>
+        <h2 class="text-3xl font-bold text-gray-800">Your Carbon Footprint</h2>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-12">
+        <!-- Results Summary -->
+        <div class="space-y-6">
+          <div class="bg-gradient-to-r from-red-500 to-orange-500 text-white p-6 rounded-xl text-center">
+            <h3 class="text-lg font-semibold mb-2">Total Monthly Emissions</h3>
+            <p id="totalEmissions" class="text-4xl font-bold">0 kg CO₂</p>
+            <p class="text-sm opacity-90 mt-2">per month</p>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4">
+            <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+              <div class="flex justify-between items-center">
+                <span class="font-semibold text-blue-800">Transportation</span>
+                <span id="transportationResult" class="text-blue-600 font-bold">0 kg CO₂</span>
+              </div>
+            </div>
+
+            <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
+              <div class="flex justify-between items-center">
+                <span class="font-semibold text-yellow-800">Energy Use</span>
+                <span id="energyResult" class="text-yellow-600 font-bold">0 kg CO₂</span>
+              </div>
+            </div>
+
+            <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+              <div class="flex justify-between items-center">
+                <span class="font-semibold text-green-800">Diet</span>
+                <span id="dietResult" class="text-green-600 font-bold">0 kg CO₂</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Environmental Impact -->
+          <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-200">
+            <h4 class="font-bold text-emerald-800 mb-3">Environmental Context</h4>
+            <p id="environmentalContext" class="text-emerald-700 text-sm leading-relaxed">
+            </p>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="flex items-center justify-center">
+          <div class="w-full max-w-md">
+            <div class="relative">
+              <canvas id="carbonChart" class="max-w-full h-auto"></canvas>
+              <div class="text-center mt-4">
+                <h4 class="text-lg font-semibold text-gray-800">Emission Breakdown</h4>
+                <p class="text-sm text-gray-600">Monthly CO₂ emissions by category</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tips Section -->
+      <div class="mt-12 bg-gradient-to-r from-blue-50 to-green-50 p-8 rounded-xl">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Reduce Your Impact</h3>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="text-center">
+            <i data-lucide="car" class="w-12 h-12 text-blue-600 mx-auto mb-3"></i>
+            <h4 class="font-semibold text-gray-800 mb-2">Transportation</h4>
+            <p class="text-sm text-gray-600">Use public transport, walk, bike, or consider electric vehicles</p>
+          </div>
+          <div class="text-center">
+            <i data-lucide="zap" class="w-12 h-12 text-yellow-600 mx-auto mb-3"></i>
+            <h4 class="font-semibold text-gray-800 mb-2">Energy</h4>
+            <p class="text-sm text-gray-600">Use LED bulbs, unplug devices, and consider renewable energy</p>
+          </div>
+          <div class="text-center">
+            <i data-lucide="apple" class="w-12 h-12 text-green-600 mx-auto mb-3"></i>
+            <h4 class="font-semibold text-gray-800 mb-2">Diet</h4>
+            <p class="text-sm text-gray-600">Eat more plant-based meals and reduce food waste</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Emission constants
+    const vehicleEmissions = {
+      car: 0.21,
+      bike: 0.05,
+      bus: 0.11,
+      train: 0.06,
+      flight: 0.25,
+    };
+
+    const dietEmissions = {
+      'meat-heavy': 600,
+      mixed: 450,
+      vegetarian: 350,
+      vegan: 300,
+    };
+
+    // Chart instance
+    let carbonChart = null;
+
+    // DOM elements
+    const calculateBtn = document.getElementById('calculateBtn');
+    const errorContainer = document.getElementById('errorContainer');
+    const errorList = document.getElementById('errorList');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const totalEmissionsElement = document.getElementById('totalEmissions');
+    const transportationResult = document.getElementById('transportationResult');
+    const energyResult = document.getElementById('energyResult');
+    const dietResult = document.getElementById('dietResult');
+    const environmentalContext = document.getElementById('environmentalContext');
+    const carbonChartCanvas = document.getElementById('carbonChart');
+
+    // Form validation
+    function validateForm() {
+      const errors = [];
+      const vehicleType = document.getElementById('vehicleType').value;
+      const weeklyKm = document.getElementById('weeklyKm').value;
+      const electricityUnits = document.getElementById('electricityUnits').value;
+      const lpgCylinders = document.getElementById('lpgCylinders').value;
+      const dietType = document.getElementById('dietType').value;
+
+      if (!vehicleType) {
+        errors.push('Please select a vehicle type');
+      }
+
+      if (!weeklyKm || isNaN(Number(weeklyKm)) || Number(weeklyKm) < 0) {
+        errors.push('Please enter valid weekly kilometers (numbers only)');
+      }
+
+      if (!electricityUnits || isNaN(Number(electricityUnits)) || Number(electricityUnits) < 0) {
+        errors.push('Please enter valid electricity units (numbers only)');
+      }
+
+      if (!lpgCylinders || isNaN(Number(lpgCylinders)) || Number(lpgCylinders) < 0) {
+        errors.push('Please enter valid LPG cylinders (numbers only)');
+      }
+
+      if (!dietType) {
+        errors.push('Please select a diet type');
+      }
+
+      return errors;
+    }
+
+    // Calculate emissions
+    function calculateEmissions() {
+      const errors = validateForm();
+      
+      if (errors.length > 0) {
+        errorList.innerHTML = errors.map(error => `<li>${error}</li>`).join('');
+        errorContainer.classList.remove('hidden');
+        resultsContainer.classList.add('hidden');
+        return;
+      }
+
+      errorContainer.classList.add('hidden');
+
+      // Get form values
+      const vehicleType = document.getElementById('vehicleType').value;
+      const weeklyKm = Number(document.getElementById('weeklyKm').value);
+      const electricityUnits = Number(document.getElementById('electricityUnits').value);
+      const lpgCylinders = Number(document.getElementById('lpgCylinders').value);
+      const dietType = document.getElementById('dietType').value;
+
+      // Transportation emissions (weekly to monthly)
+      const monthlyKm = weeklyKm * 4.33; // Average weeks per month
+      const vehicleEmission = vehicleEmissions[vehicleType];
+      const transportation = monthlyKm * vehicleEmission;
+
+      // Energy emissions
+      const electricity = electricityUnits * 0.9;
+      const lpg = lpgCylinders * 2.983;
+      const energy = electricity + lpg;
+
+      // Diet emissions (annual to monthly)
+      const annualDiet = dietEmissions[dietType];
+      const diet = annualDiet / 12;
+
+      const total = transportation + energy + diet;
+
+      const results = {
+        transportation: Math.round(transportation * 100) / 100,
+        energy: Math.round(energy * 100) / 100,
+        diet: Math.round(diet * 100) / 100,
+        total: Math.round(total * 100) / 100,
+      };
+
+      // Update UI with results
+      updateResultsUI(results);
+      
+      // Show results section
+      resultsContainer.classList.remove('hidden');
+      
+      // Smooth scroll to results
+      setTimeout(() => {
+        resultsContainer.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
+
+    // Update results in UI
+    function updateResultsUI(results) {
+      totalEmissionsElement.textContent = `${results.total} kg CO₂`;
+      transportationResult.textContent = `${results.transportation} kg CO₂`;
+      energyResult.textContent = `${results.energy} kg CO₂`;
+      dietResult.textContent = `${results.diet} kg CO₂`;
+
+      // Update environmental context
+      const annualTotal = Math.round(results.total * 12);
+      let contextText = `The global average carbon footprint is about 4,000 kg CO₂ per person per year. 
+        Your monthly footprint of ${results.total} kg equals ${annualTotal} kg per year.`;
+      
+      if (annualTotal < 4000) {
+        contextText += " Great job! You're below the global average.";
+      } else {
+        contextText += " Consider reducing emissions in high-impact areas.";
+      }
+      
+      environmentalContext.textContent = contextText;
+
+      // Update chart
+      updateChart(results);
+    }
+
+    // Update or create chart
+    function updateChart(results) {
+      // Destroy existing chart if it exists
+      if (carbonChart) {
+        carbonChart.destroy();
+      }
+
+      const ctx = carbonChartCanvas.getContext('2d');
+      
+      carbonChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Transportation', 'Energy Use', 'Diet'],
+          datasets: [{
+            data: [results.transportation, results.energy, results.diet],
+            backgroundColor: [
+              'rgba(59, 130, 246, 0.8)', // Blue for transportation
+              'rgba(245, 158, 11, 0.8)', // Yellow for energy
+              'rgba(34, 197, 94, 0.8)',  // Green for diet
+            ],
+            borderColor: [
+              'rgba(59, 130, 246, 1)',
+              'rgba(245, 158, 11, 1)',
+              'rgba(34, 197, 94, 1)',
+            ],
+            borderWidth: 2,
+            hoverOffset: 10,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 20,
+                font: {
+                  size: 14,
+                  weight: '500',
+                },
+                color: '#374151',
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = Math.round((value / total) * 100);
+                  return `${label}: ${value} kg CO₂ (${percentage}%)`;
+                }
+              },
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              titleColor: 'white',
+              bodyColor: 'white',
+              borderColor: 'rgba(255, 255, 255, 0.2)',
+              borderWidth: 1,
+              cornerRadius: 8,
+              displayColors: true,
+            }
+          },
+          cutout: '50%',
+          animation: {
+            animateRotate: true,
+            animateScale: true,
+            duration: 1500,
+            easing: 'easeOutQuart',
+          },
+          elements: {
+            arc: {
+              borderRadius: 4,
+            }
+          }
+        }
+      });
+    }
+
+    // Event listeners
+    calculateBtn.addEventListener('click', calculateEmissions);
+  </script>
+</body>
+</html>
