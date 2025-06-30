@@ -4,12 +4,369 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EcoMeter - Carbon Footprint Calculator</title>
-  <!-- Changed to relative path -->
-  <link rel="icon" href="./Logo.png" type="image/png">
-<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
-<script src="https://cdn.tailwindcss.com" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
+    /* Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 50%, #ecfdf5 100%);
+      color: #1f2937;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    /* Header Styles */
+    .header {
+      background: linear-gradient(to right, #16a34a, #2563eb);
+      color: white;
+      padding: 3rem 0;
+      text-align: center;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 42rem;
+      margin: 0 auto;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .header h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-left: 1rem;
+    }
+
+    .header p {
+      font-size: 1.25rem;
+      opacity: 0.9;
+    }
+
+    /* Form Styles */
+    .form-container {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      padding: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 2rem;
+    }
+
+    .form-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-left: 0.75rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .info-box {
+      background-color: #f0fdf4;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border-left: 4px solid #22c55e;
+    }
+
+    .info-box h4 {
+      font-weight: 600;
+      color: #166534;
+      margin-bottom: 0.5rem;
+    }
+
+    .info-box ul {
+      list-style-type: disc;
+      padding-left: 1.25rem;
+      color: #15803d;
+      font-size: 0.875rem;
+    }
+
+    .info-box li {
+      margin-bottom: 0.25rem;
+    }
+
+    /* Button Styles */
+    .calculate-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(to right, #16a34a, #2563eb);
+      color: white;
+      font-weight: 700;
+      font-size: 1.125rem;
+      padding: 1rem 3rem;
+      border-radius: 9999px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      margin-top: 3rem;
+    }
+
+    .calculate-btn:hover {
+      background: linear-gradient(to right, #15803d, #1d4ed8);
+      transform: translateY(-1px) scale(1.05);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .calculate-btn:active {
+      transform: translateY(0) scale(1);
+    }
+
+    /* Results Section */
+    .results-container {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      padding: 2rem;
+      display: none;
+      animation: fade-in 0.6s ease-out;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .results-header h2 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      margin-left: 1rem;
+    }
+
+    .results-grid {
+      display: grid;
+      gap: 3rem;
+    }
+
+    .total-emissions {
+      background: linear-gradient(to right, #ef4444, #f97316);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      text-align: center;
+    }
+
+    .total-emissions h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .total-emissions p {
+      font-size: 2.25rem;
+      font-weight: 700;
+    }
+
+    .total-emissions small {
+      font-size: 0.875rem;
+      opacity: 0.9;
+    }
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .transportation-item {
+      background-color: #eff6ff;
+      border-left: 4px solid #3b82f6;
+    }
+
+    .energy-item {
+      background-color: #fefce8;
+      border-left: 4px solid #eab308;
+    }
+
+    .diet-item {
+      background-color: #f0fdf4;
+      border-left: 4px solid #22c55e;
+    }
+
+    .result-label {
+      font-weight: 600;
+    }
+
+    .transportation-label {
+      color: #1e40af;
+    }
+
+    .energy-label {
+      color: #854d0e;
+    }
+
+    .diet-label {
+      color: #166534;
+    }
+
+    .result-value {
+      font-weight: 700;
+    }
+
+    .transportation-value {
+      color: #2563eb;
+    }
+
+    .energy-value {
+      color: #ca8a04;
+    }
+
+    .diet-value {
+      color: #16a34a;
+    }
+
+    .context-box {
+      background-color: #ecfdf5;
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      border: 1px solid #a7f3d0;
+      margin-top: 1.5rem;
+    }
+
+    .context-box h4 {
+      font-weight: 700;
+      color: #065f46;
+      margin-bottom: 0.75rem;
+    }
+
+    .context-box p {
+      color: #047857;
+      font-size: 0.875rem;
+      line-height: 1.625;
+    }
+
+    /* Tips Section */
+    .tips-section {
+      background: linear-gradient(to right, #eff6ff, #f0fdf4);
+      padding: 2rem;
+      border-radius: 0.75rem;
+      margin-top: 3rem;
+    }
+
+    .tips-section h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .tips-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .tip-card {
+      text-align: center;
+    }
+
+    .tip-card h4 {
+      font-weight: 600;
+      margin: 0.75rem 0 0.5rem;
+    }
+
+    .tip-card p {
+      font-size: 0.875rem;
+      color: #4b5563;
+    }
+
+    /* Error Styles */
+    .error-container {
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      display: none;
+    }
+
+    .error-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .error-header h3 {
+      font-weight: 600;
+      color: #991b1b;
+      margin-left: 0.5rem;
+    }
+
+    .error-list {
+      color: #b91c1c;
+      padding-left: 1.25rem;
+    }
+
+    .error-list li {
+      margin-bottom: 0.25rem;
+    }
+
+    /* Animations */
     @keyframes fade-in {
       from {
         opacity: 0;
@@ -43,91 +400,70 @@
       background: #9ca3af;
     }
 
-    /* Smooth focus transitions */
-    input:focus, select:focus, button:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    /* Enhanced button animations */
-    button {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    button:hover {
-      transform: translateY(-1px);
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
-
-    /* Card hover effects */
-    .card-hover {
-      transition: all 0.3s ease;
-    }
-
-    .card-hover:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    }
-
-    /* Responsive text sizing */
-    @media (max-width: 640px) {
-      h1 {
-        font-size: 2.5rem;
+    /* Responsive Styles */
+    @media (min-width: 768px) {
+      .form-grid {
+        grid-template-columns: repeat(3, 1fr);
       }
-      
-      .container {
-        padding-left: 1rem;
-        padding-right: 1rem;
+
+      .tips-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .results-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .header h1 {
+        font-size: 2.5rem;
       }
     }
   </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50">
+<body>
   <!-- Header -->
-  <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white py-12">
-    <div class="container mx-auto px-4">
-      <div class="flex items-center justify-center mb-4">
-        <i data-lucide="leaf" class="w-12 h-12 mr-4 animate-pulse"></i>
-        <h1 class="text-4xl md:text-5xl font-bold">EcoMeter</h1>
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="header-title">
+          <i data-lucide="leaf" class="w-12 h-12 animate-pulse"></i>
+          <h1> EcoMeter</h1>
+        </div>
+        <p>
+          Discover your environmental impact and learn how to reduce your carbon footprint for a sustainable future.
+        </p>
       </div>
-      <p class="text-xl text-center max-w-2xl mx-auto opacity-90">
-        Discover your environmental impact and learn how to reduce your carbon footprint for a sustainable future.
-      </p>
     </div>
-  </div>
+  </header>
 
-  <div class="container mx-auto px-4 py-12">
+  <main class="container" style="padding: 3rem 0;">
     <!-- Error Messages -->
-    <div id="errorContainer" class="mb-8 bg-red-50 border border-red-200 rounded-xl p-6 hidden">
-      <div class="flex items-center mb-3">
-        <i data-lucide="alert-circle" class="w-5 h-5 text-red-500 mr-2"></i>
-        <h3 class="text-red-800 font-semibold">Please fix the following errors:</h3>
+    <div id="errorContainer" class="error-container">
+      <div class="error-header">
+        <i data-lucide="alert-circle" class="w-5 h-5 text-red-500"></i>
+        <h3>Please fix the following errors:</h3>
       </div>
-      <ul id="errorList" class="list-disc list-inside text-red-700 space-y-1">
+      <ul id="errorList" class="error-list">
       </ul>
     </div>
 
     <!-- Main Form -->
-    <div class="bg-white rounded-2xl shadow-xl p-8 mb-12">
-      <div class="grid md:grid-cols-3 gap-8">
+    <div class="form-container">
+      <div class="form-grid">
         <!-- Transportation Section -->
-        <div class="space-y-6">
-          <div class="flex items-center mb-6">
-            <i data-lucide="car" class="w-8 h-8 text-blue-600 mr-3"></i>
-            <h2 class="text-2xl font-bold text-gray-800">Transportation</h2>
+        <div class="form-section">
+          <div class="section-header">
+            <i data-lucide="car" class="w-8 h-8 text-blue-600"></i>
+            <h2>Transportation</h2>
           </div>
           
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Vehicle Type
-            </label>
-            <select
-              id="vehicleType"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-            >
+          <div class="form-group">
+            <label for="vehicleType">Vehicle Type</label>
+            <select id="vehicleType">
               <option value="">Select vehicle type</option>
               <option value="car">Car</option>
               <option value="bike">Bike/Motorcycle</option>
@@ -137,72 +473,40 @@
             </select>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Kilometers per Week
-            </label>
-            <input
-              type="number"
-              id="weeklyKm"
-              min="0"
-              step="0.1"
-              placeholder="e.g., 50"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-            />
+          <div class="form-group">
+            <label for="weeklyKm">Kilometers per Week</label>
+            <input type="number" id="weeklyKm" min="0" step="0.1" placeholder="e.g., 50">
           </div>
         </div>
 
         <!-- Energy Section -->
-        <div class="space-y-6">
-          <div class="flex items-center mb-6">
-            <i data-lucide="zap" class="w-8 h-8 text-yellow-600 mr-3"></i>
-            <h2 class="text-2xl font-bold text-gray-800">Energy Use</h2>
+        <div class="form-section">
+          <div class="section-header">
+            <i data-lucide="zap" class="w-8 h-8 text-yellow-600"></i>
+            <h2>Energy Use</h2>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Electricity Units per Month
-            </label>
-            <input
-              type="number"
-              id="electricityUnits"
-              min="0"
-              step="1"
-              placeholder="e.g., 300"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
-            />
+          <div class="form-group">
+            <label for="electricityUnits">Electricity Units per Month</label>
+            <input type="number" id="electricityUnits" min="0" step="1" placeholder="e.g., 300">
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              LPG Cylinders per Month
-            </label>
-            <input
-              type="number"
-              id="lpgCylinders"
-              min="0"
-              step="0.5"
-              placeholder="e.g., 1"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
-            />
+          <div class="form-group">
+            <label for="lpgCylinders">LPG Cylinders per Month</label>
+            <input type="number" id="lpgCylinders" min="0" step="0.5" placeholder="e.g., 1">
           </div>
         </div>
 
         <!-- Diet Section -->
-        <div class="space-y-6">
-          <div class="flex items-center mb-6">
-            <i data-lucide="apple" class="w-8 h-8 text-green-600 mr-3"></i>
-            <h2 class="text-2xl font-bold text-gray-800">Diet</h2>
+        <div class="form-section">
+          <div class="section-header">
+            <i data-lucide="apple" class="w-8 h-8 text-green-600"></i>
+            <h2>Diet</h2>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Diet Type
-            </label>
-            <select
-              id="dietType"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
-            >
+          <div class="form-group">
+            <label for="dietType">Diet Type</label>
+            <select id="dietType">
               <option value="">Select diet type</option>
               <option value="meat-heavy">Meat-heavy</option>
               <option value="mixed">Mixed (Balanced)</option>
@@ -211,9 +515,9 @@
             </select>
           </div>
 
-          <div class="bg-green-50 p-4 rounded-lg">
-            <h4 class="font-semibold text-green-800 mb-2">Diet Impact Info:</h4>
-            <ul class="text-sm text-green-700 space-y-1">
+          <div class="info-box">
+            <h4>Diet Impact Info:</h4>
+            <ul>
               <li>• Meat-heavy: 600 kg CO₂/year</li>
               <li>• Mixed: 450 kg CO₂/year</li>
               <li>• Vegetarian: 350 kg CO₂/year</li>
@@ -224,11 +528,8 @@
       </div>
 
       <!-- Calculate Button -->
-      <div class="flex justify-center mt-12">
-        <button
-          id="calculateBtn"
-          class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-4 px-12 rounded-full text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center"
-        >
+      <div style="text-align: center;">
+        <button id="calculateBtn" class="calculate-btn">
           <i data-lucide="calculator" class="w-6 h-6 mr-3"></i>
           Calculate My Carbon Footprint
         </button>
@@ -236,60 +537,53 @@
     </div>
 
     <!-- Results Section -->
-    <div id="resultsContainer" class="bg-white rounded-2xl shadow-xl p-8 hidden animate-fade-in">
-      <div class="flex items-center justify-center mb-8">
-        <i data-lucide="pie-chart" class="w-10 h-10 text-blue-600 mr-4"></i>
-        <h2 class="text-3xl font-bold text-gray-800">Your Carbon Footprint</h2>
+    <div id="resultsContainer" class="results-container">
+      <div class="results-header">
+        <i data-lucide="pie-chart" class="w-10 h-10 text-blue-600"></i>
+        <h2>Your Carbon Footprint</h2>
       </div>
 
-      <div class="grid lg:grid-cols-2 gap-12">
+      <div class="results-grid">
         <!-- Results Summary -->
-        <div class="space-y-6">
-          <div class="bg-gradient-to-r from-red-500 to-orange-500 text-white p-6 rounded-xl text-center">
-            <h3 class="text-lg font-semibold mb-2">Total Monthly Emissions</h3>
-            <p id="totalEmissions" class="text-4xl font-bold">0 kg CO₂</p>
-            <p class="text-sm opacity-90 mt-2">per month</p>
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+          <div class="total-emissions">
+            <h3>Total Monthly Emissions</h3>
+            <p id="totalEmissions">0 kg CO₂</p>
+            <small>per month</small>
           </div>
 
-          <div class="grid grid-cols-1 gap-4">
-            <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-              <div class="flex justify-between items-center">
-                <span class="font-semibold text-blue-800">Transportation</span>
-                <span id="transportationResult" class="text-blue-600 font-bold">0 kg CO₂</span>
-              </div>
+          <div>
+            <div class="result-item transportation-item">
+              <span class="result-label transportation-label">Transportation</span>
+              <span id="transportationResult" class="result-value transportation-value">0 kg CO₂</span>
             </div>
 
-            <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
-              <div class="flex justify-between items-center">
-                <span class="font-semibold text-yellow-800">Energy Use</span>
-                <span id="energyResult" class="text-yellow-600 font-bold">0 kg CO₂</span>
-              </div>
+            <div class="result-item energy-item">
+              <span class="result-label energy-label">Energy Use</span>
+              <span id="energyResult" class="result-value energy-value">0 kg CO₂</span>
             </div>
 
-            <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
-              <div class="flex justify-between items-center">
-                <span class="font-semibold text-green-800">Diet</span>
-                <span id="dietResult" class="text-green-600 font-bold">0 kg CO₂</span>
-              </div>
+            <div class="result-item diet-item">
+              <span class="result-label diet-label">Diet</span>
+              <span id="dietResult" class="result-value diet-value">0 kg CO₂</span>
             </div>
           </div>
 
           <!-- Environmental Impact -->
-          <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-200">
-            <h4 class="font-bold text-emerald-800 mb-3">Environmental Context</h4>
-            <p id="environmentalContext" class="text-emerald-700 text-sm leading-relaxed">
-            </p>
+          <div class="context-box">
+            <h4>Environmental Context</h4>
+            <p id="environmentalContext"></p>
           </div>
         </div>
 
         <!-- Chart -->
-        <div class="flex items-center justify-center">
-          <div class="w-full max-w-md">
-            <div class="relative">
-              <canvas id="carbonChart" class="max-w-full h-auto"></canvas>
-              <div class="text-center mt-4">
-                <h4 class="text-lg font-semibold text-gray-800">Emission Breakdown</h4>
-                <p class="text-sm text-gray-600">Monthly CO₂ emissions by category</p>
+        <div style="display: flex; align-items: center; justify-content: center;">
+          <div style="width: 100%; max-width: 28rem;">
+            <div style="position: relative;">
+              <canvas id="carbonChart" style="max-width: 100%; height: auto;"></canvas>
+              <div style="text-align: center; margin-top: 1rem;">
+                <h4 style="font-size: 1.125rem; font-weight: 600;">Emission Breakdown</h4>
+                <p style="font-size: 0.875rem; color: #4b5563;">Monthly CO₂ emissions by category</p>
               </div>
             </div>
           </div>
@@ -297,34 +591,33 @@
       </div>
 
       <!-- Tips Section -->
-      <div class="mt-12 bg-gradient-to-r from-blue-50 to-green-50 p-8 rounded-xl">
-        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Reduce Your Impact</h3>
-        <div class="grid md:grid-cols-3 gap-6">
-          <div class="text-center">
-            <i data-lucide="car" class="w-12 h-12 text-blue-600 mx-auto mb-3"></i>
-            <h4 class="font-semibold text-gray-800 mb-2">Transportation</h4>
-            <p class="text-sm text-gray-600">Use public transport, walk, bike, or consider electric vehicles</p>
+      <div class="tips-section">
+        <h3>Reduce Your Impact</h3>
+        <div class="tips-grid">
+          <div class="tip-card">
+            <i data-lucide="car" class="w-12 h-12 text-blue-600 mx-auto"></i>
+            <h4>Transportation</h4>
+            <p>Use public transport, walk, bike, or consider electric vehicles</p>
           </div>
-          <div class="text-center">
-            <i data-lucide="zap" class="w-12 h-12 text-yellow-600 mx-auto mb-3"></i>
-            <h4 class="font-semibold text-gray-800 mb-2">Energy</h4>
-            <p class="text-sm text-gray-600">Use LED bulbs, unplug devices, and consider renewable energy</p>
+          <div class="tip-card">
+            <i data-lucide="zap" class="w-12 h-12 text-yellow-600 mx-auto"></i>
+            <h4>Energy</h4>
+            <p>Use LED bulbs, unplug devices, and consider renewable energy</p>
           </div>
-          <div class="text-center">
-            <i data-lucide="apple" class="w-12 h-12 text-green-600 mx-auto mb-3"></i>
-            <h4 class="font-semibold text-gray-800 mb-2">Diet</h4>
-            <p class="text-sm text-gray-600">Eat more plant-based meals and reduce food waste</p>
+          <div class="tip-card">
+            <i data-lucide="apple" class="w-12 h-12 text-green-600 mx-auto"></i>
+            <h4>Diet</h4>
+            <p>Eat more plant-based meals and reduce food waste</p>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </main>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-  lucide.createIcons();
-  calculateBtn.addEventListener('click', calculateEmissions);
-});
+    // Initialize Lucide icons
+    lucide.createIcons();
+
     // Emission constants
     const vehicleEmissions = {
       car: 0.21,
@@ -394,12 +687,12 @@
       
       if (errors.length > 0) {
         errorList.innerHTML = errors.map(error => `<li>${error}</li>`).join('');
-        errorContainer.classList.remove('hidden');
-        resultsContainer.classList.add('hidden');
+        errorContainer.style.display = 'block';
+        resultsContainer.style.display = 'none';
         return;
       }
 
-      errorContainer.classList.add('hidden');
+      errorContainer.style.display = 'none';
 
       // Get form values
       const vehicleType = document.getElementById('vehicleType').value;
@@ -435,7 +728,7 @@
       updateResultsUI(results);
       
       // Show results section
-      resultsContainer.classList.remove('hidden');
+      resultsContainer.style.display = 'block';
       
       // Smooth scroll to results
       setTimeout(() => {
@@ -549,6 +842,8 @@
       });
     }
 
+    // Event listeners
+    calculateBtn.addEventListener('click', calculateEmissions);
   </script>
 </body>
 </html>
